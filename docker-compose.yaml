@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  front-end:
+    container_name: react-frontend
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    tty: true
+  apache:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: apache
+    restart: unless-stopped
+    working_dir: /var/www/backend
+    volumes:
+      - ./backend:/var/www/backend
+    ports:
+      - "80:80"
+  mysql:
+    container_name: mysql-matcha
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+#  mailhog:
+#    image: mailhog/mailhog
+#    container_name: mailhog
+#    restart: unless-stopped
+#    logging:
+#      driver: 'none'  # disable saving logs
+#    ports:
+#      - "8025:8025"
